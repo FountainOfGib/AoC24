@@ -1,7 +1,5 @@
 package main
 
-// asda
-
 import (
 	"bufio"
 	"fmt"
