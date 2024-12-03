@@ -14,10 +14,8 @@ func RemoveAt[T any](slice []T, i int) []T {
 	Tcopy := make([]T, len(slice))
 	copy(Tcopy, slice[:])
 	if i < 0 || i >= len(Tcopy) {
-		// Return the original slice if index is out of bounds
 		return Tcopy
 	}
-	// Remove the element by slicing and concatenating
 	return append(Tcopy[:i], Tcopy[i+1:]...)
 }
 
@@ -35,13 +33,10 @@ func isSafe(inputLine []string, dampened bool) bool {
 				return false
 			} else {
 				fmt.Println("attempting dampening ...")
-				for i := 0; i < len(inputLine); i++ {
-					if isSafe(RemoveAt(inputLine, i), true) {
-						return true
-					}
-				}
-				defer fmt.Println("dampening attempt complete")
-				return false
+				defer fmt.Println("dampening complete ...")
+				return isSafe(RemoveAt(inputLine, i-1), true) ||
+					isSafe(RemoveAt(inputLine, i), true) ||
+					isSafe(RemoveAt(inputLine, 0), true) // stupid hack to get around complex checking of increasing / decreasing
 			}
 		}
 	}
@@ -55,9 +50,7 @@ func main() {
 		return
 	}
 	defer file.Close()
-
 	scanner := bufio.NewScanner(file)
-
 	safeCount := 0
 	for scanner.Scan() {
 		line := strings.Split(scanner.Text(), " ")
@@ -68,6 +61,8 @@ func main() {
 		if isSafe(line, false) {
 			safeCount += 1
 			fmt.Println(line, "safe")
+		} else {
+			fmt.Println(line, "not safe")
 		}
 	}
 	fmt.Println("Safe count:", safeCount)
