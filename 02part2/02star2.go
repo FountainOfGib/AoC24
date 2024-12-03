@@ -10,24 +10,42 @@ import (
 
 var fileName = "input.txt"
 
-func isSafe(line []string, increasing bool) bool {
-	safe := true
-	dampened := []string{}
-	for i := 1; i < len(line); i++ {
-		firstValue, _ := strconv.Atoi(line[i-1])
-		secondValue, _ := strconv.Atoi(line[i])
+func RemoveAt[T any](slice []T, i int) []T {
+	Tcopy := make([]T, len(slice))
+	copy(Tcopy, slice[:])
+	if i < 0 || i >= len(Tcopy) {
+		// Return the original slice if index is out of bounds
+		return Tcopy
+	}
+	// Remove the element by slicing and concatenating
+	return append(Tcopy[:i], Tcopy[i+1:]...)
+}
+
+func isSafe(inputLine []string, dampened bool) bool {
+	a, _ := strconv.Atoi(inputLine[0])
+	b, _ := strconv.Atoi(inputLine[1])
+	increasing := a < b
+	for i := 1; i < len(inputLine); i++ {
+		firstValue, _ := strconv.Atoi(inputLine[i-1])
+		secondValue, _ := strconv.Atoi(inputLine[i])
 		if (increasing && (secondValue-firstValue > 3 || secondValue-firstValue < 1)) ||
 			(!increasing && (firstValue-secondValue > 3 || firstValue-secondValue < 1)) {
-			if len(dampened) != 0 {
-				fmt.Println(line, "not safe", "increasing:", increasing, firstValue, secondValue, "diff:", secondValue-firstValue, "at i:", i)
+			fmt.Println(inputLine, "not safe", "increasing:", increasing, firstValue, secondValue, "diff:", secondValue-firstValue, "at i:", i)
+			if dampened {
 				return false
 			} else {
-				dampened = append(line[:i], line[i+1:]...)
-				i--
+				fmt.Println("attempting dampening ...")
+				for i := 0; i < len(inputLine); i++ {
+					if isSafe(RemoveAt(inputLine, i), true) {
+						return true
+					}
+				}
+				defer fmt.Println("dampening attempt complete")
+				return false
 			}
 		}
 	}
-	return safe
+	return true
 }
 
 func main() {
@@ -47,9 +65,7 @@ func main() {
 			fmt.Println("line has no values!!??")
 			return
 		}
-		firstValue, _ := strconv.Atoi(line[0])
-		secondValue, _ := strconv.Atoi(line[1])
-		if isSafe(line, firstValue < secondValue) {
+		if isSafe(line, false) {
 			safeCount += 1
 			fmt.Println(line, "safe")
 		}
