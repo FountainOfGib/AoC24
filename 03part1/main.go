@@ -37,8 +37,5 @@ func main() {
 		intB, _ := strconv.Atoi(numberMatches[1])
 		sum += intA * intB
 	}
-	// mulExpRegexGrp := regexp.MustCompile(`mul\((\d+)\,(\d+)\)`)
-	// mulExpMatchesSubmatch := mulExpRegexGrp.FindAllStringSubmatch(textBlob, -1)
-	// fmt.Println(mulExpMatchesSubmatch)
 	fmt.Println("ur sum is", sum, "ya fucker")
 }
